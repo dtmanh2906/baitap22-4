@@ -33,10 +33,12 @@ namespace baitap22_4
                 }
 
                 string query = "SELECT * FROM SinhVien";
-                SqlDataAdapter da = new SqlDataAdapter(query, sqlCon);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                dataGridView1.DataSource = dt;
+                using (SqlDataAdapter da = new SqlDataAdapter(query, sqlCon))
+                {
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    dataGridView1.DataSource = dt;
+                }
             }
             catch (Exception ex)
             {
@@ -50,13 +52,19 @@ namespace baitap22_4
             {
                 using (SqlConnection sqlCon = new SqlConnection(strCon))
                 {
+                    if(string.IsNullOrWhiteSpace(txtMSSV.Text) || string.IsNullOrWhiteSpace(txtHoTen.Text)||
+                        string.IsNullOrWhiteSpace(txtNgaySinh.Text) || string.IsNullOrWhiteSpace(txtDiaChi.Text))
+                    {
+                        MessageBox.Show("Vui lòng nhập thông tin trước khi thêm ");
+                        return;
+                    }
                     sqlCon.Open();
                     string query = "INSERT INTO SinhVien (MSSV, HoTen,Ngaysinh,Diachi) VALUES (@MSSV, @HoTen,@NgaySinh,@DiaChi)";
                     using (SqlCommand cmd = new SqlCommand(query, sqlCon))
                     {
                         cmd.Parameters.AddWithValue("@MSSV", txtMSSV.Text);
                         cmd.Parameters.AddWithValue("@HoTen", txtHoTen.Text);
-                        cmd.Parameters.AddWithValue("@Ngaysinh", txtNgaySinh.Text);
+                        cmd.Parameters.AddWithValue("@Ngaysinh",txtNgaySinh.Text);
                         cmd.Parameters.AddWithValue("@Diachi", txtDiaChi.Text);
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Thêm thành công!");
@@ -127,6 +135,11 @@ namespace baitap22_4
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(txtMSSV.Text))
+                {
+                    MessageBox.Show("Vui lòng nhập MSSV cần xóa!");
+                    return;
+                }
                 using (SqlConnection sqlCon = new SqlConnection(strCon))
                 {
                     sqlCon.Open();
